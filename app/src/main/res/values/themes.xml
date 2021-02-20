@@ -1,0 +1,24 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.Binge" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary" >@color/white</item>
+        <item name="colorPrimaryDark">@color/black</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+    </style>
+
+    <style name="Widget.Binge.Toolbar" parent="Widget.AppCompat.Toolbar">
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="titleTextColor">?attr/colorOnPrimary</item>
+        <item name="titleTextAppearance">@style/TextAppearance.Binge.Toolbar</item>
+        <item name="android:theme">?theme</item>
+    </style>
+
+    <style name="TextAppearance.Binge.Toolbar" parent="TextAppearance.MaterialComponents.Button">
+        <item name="android:textSize">18sp</item>
+        <item name="font">@font/alegreya_bold</item>
+        <item name="android:fontFamily">@font/alegreya_bold</item>
+    </style>
+
+</resources>
