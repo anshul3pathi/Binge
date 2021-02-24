@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Binge</string>
     <string name="hello_blank_fragment">Fuck Off</string>
+    <string name="fetching_data_please_wait">Fetching data. Please Wait.</string>
 </resources>
