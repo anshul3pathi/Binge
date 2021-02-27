@@ -2,14 +2,16 @@ package com.example.binge.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.AdapterView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.binge.databinding.ItemFeedBinding
 import com.example.binge.model.data.GenreFeed
+import com.example.binge.model.data.Movies
 import kotlinx.coroutines.GlobalScope
 
-class FeedAdapter :
+class FeedAdapter(private val movieItemClickListener: MovieItemClicked) :
             ListAdapter<GenreFeed, FeedAdapter.FeedItemViewHolder>(FeedDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedItemViewHolder {
@@ -30,7 +32,7 @@ class FeedAdapter :
     inner class FeedItemViewHolder(private val binding: ItemFeedBinding)
         : RecyclerView.ViewHolder(binding.root) {
         fun bind(genreFeed: GenreFeed) {
-            val movieAdapter = MoviesAdapter()
+            val movieAdapter = MoviesAdapter(movieItemClickListener)
             binding.genreRecyclerView.adapter = movieAdapter
 //            genreFeed.movies = genreFeed.movies.sortedBy { it.movieName }
             movieAdapter.submitList(genreFeed.movies)
@@ -47,4 +49,8 @@ class FeedDiffCallback : DiffUtil.ItemCallback<GenreFeed>() {
     override fun areContentsTheSame(oldItem: GenreFeed, newItem: GenreFeed): Boolean {
         return oldItem == newItem
     }
+}
+
+interface MovieItemClicked {
+    fun onMovieItemClicked(movie: Movies)
 }

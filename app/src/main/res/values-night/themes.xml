@@ -1,16 +1,74 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.Binge" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/white</item>
-        <item name="colorPrimaryVariant">@color/white</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/white</item>
-        <item name="colorSecondaryVariant">@color/white</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
+    <style name="Theme.Binge" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary" >@color/black</item>
+        <item name="colorPrimaryDark">@color/white</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="android:statusBarColor">@color/black</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+        <item name="colorControlNormal">?attr/colorOnPrimary</item>
+        <item name="colorOnPrimarySurface">?attr/colorPrimary</item>
+        <item name="colorOnSurface">?attr/colorPrimary</item>
     </style>
+
+    <style name="Widget.Binge.Toolbar" parent="Widget.AppCompat.Toolbar">
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="titleTextColor">?attr/colorOnPrimary</item>
+        <item name="titleTextAppearance">@style/TextAppearance.Binge.Toolbar</item>
+        <item name="android:theme">?theme</item>
+    </style>
+
+    <style name="TextAppearance.Binge.Toolbar" parent="TextAppearance.MaterialComponents.Button">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="font">@font/alegreya_bold</item>
+        <item name="fontFamily">@font/alegreya_bold</item>
+        <item name="android:fontFamily">@font/alegreya_bold</item>
+    </style>
+
+    <style name="TextAppearance.Binge.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="font">@font/alegreya</item>
+        <item name="fontFamily">@font/alegreya</item>
+        <item name="android:fontFamily">@font/alegreya</item>
+        <item name="backgroundTint">@color/grey_night</item>
+    </style>
+
+    <style name="TextAppearance.Binge.Heading" parent="TextAppearance.MaterialComponents.Headline1">
+        <item name="android:textSize">18sp</item>
+        <item name="font">@font/belgrano</item>
+        <item name="fontFamily">@font/belgrano</item>
+        <item name="android:fontFamily">@font/belgrano</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="TextAppearance.Binge.Body" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textSize">16sp</item>
+        <item name="font">@font/alegreya</item>
+        <item name="fontFamily">@font/belgrano</item>
+        <item name="android:fontFamily">@font/belgrano</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="TextAppearance.Binge.DetailedText" parent="TextAppearance.Binge.Body">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="TextAppearance.Binge.DetailedTextLabel" parent="TextAppearance.Binge.Body">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/grey_night</item>
+    </style>
+
+    <style name="Widget.Binge.CircularProgressIndicator" parent="Widget.MaterialComponents.CircularProgressIndicator">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.CircularProgressIndicator</item>
+        <item name="trackThickness">20dp</item>
+    </style>
+
+    <style name="ThemeOverlay.App.CircularProgressIndicator" parent="">
+        <item name="colorPrimary">@color/black</item>
+    </style>
+
 </resources>

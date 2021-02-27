@@ -1,14 +1,180 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.fragments.movie.DetailMovieFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <data>
+        <variable
+            name="movie"
+            type="com.example.binge.model.data.Movies" />
+
+        <variable
+            name="viewModel"
+            type="com.example.binge.ui.fragments.movie.DetailMovieViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:background="?attr/colorPrimary"
+        tools:context=".ui.fragments.movie.DetailMovieFragment">
 
-</FrameLayout>
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/detailedImageCardView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginBottom="8dp"
+            android:elevation="6dp">
+
+            <ImageView
+                android:id="@+id/detailedImageView"
+                android:layout_width="150dp"
+                android:layout_height="200dp"
+                android:scaleType="fitXY"
+                app:imageUrl="@{movie.thumbNailUrl}"
+                tools:src="@tools:sample/backgrounds/scenic" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:id="@+id/ratingLabelTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/detailedImageCardView"
+            app:layout_constraintStart_toEndOf="@id/detailedImageCardView"
+            android:layout_marginStart="8dp"
+            android:padding="4dp"
+            android:text="@string/rating"
+            style="@style/TextAppearance.Binge.DetailedTextLabel" />
+
+        <TextView
+            android:id="@+id/ratingTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/ratingLabelTextView"
+            app:layout_constraintStart_toEndOf="@id/ratingLabelTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="4dp"
+            android:padding="4dp"
+            app:textFromDouble="@{movie.rating}"
+            tools:text="9.0"
+            style="@style/TextAppearance.Binge.DetailedText" />
+
+        <TextView
+            android:id="@+id/directorsLabelTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/ratingTextView"
+            app:layout_constraintStart_toStartOf="@id/ratingLabelTextView"
+            android:layout_marginTop="8dp"
+            android:padding="4dp"
+            android:text="@string/directors"
+            style="@style/TextAppearance.Binge.DetailedTextLabel" />
+
+        <TextView
+            android:id="@+id/directorsTextView"
+            android:layout_width="0dp"
+            android:padding="4dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/directorsLabelTextView"
+            app:layout_constraintStart_toEndOf="@id/directorsLabelTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="4dp"
+            app:textFromList="@{movie.directors}"
+            tools:text="Christopher Nolan"
+            style="@style/TextAppearance.Binge.DetailedText"/>
+
+        <TextView
+            android:id="@+id/starringLabelTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/directorsTextView"
+            app:layout_constraintStart_toStartOf="@id/ratingLabelTextView"
+            android:layout_marginTop="8dp"
+            android:padding="4dp"
+            android:text="@string/starring"
+            style="@style/TextAppearance.Binge.DetailedTextLabel" />
+
+        <TextView
+            android:id="@+id/starringTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/starringLabelTextView"
+            app:layout_constraintStart_toEndOf="@id/starringLabelTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="4dp"
+            android:padding="4dp"
+            app:textFromList="@{movie.actors}"
+            tools:text="Ayushman Khurana, Radhika Apte, Tabbu"
+            style="@style/TextAppearance.Binge.DetailedText" />
+
+        <TextView
+            android:id="@+id/genreLabelTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/starringTextView"
+            app:layout_constraintStart_toStartOf="@id/starringLabelTextView"
+            android:layout_marginTop="8dp"
+            android:padding="4dp"
+            android:text="@string/genre"
+            style="@style/TextAppearance.Binge.DetailedTextLabel" />
+
+        <TextView
+            android:id="@+id/genreTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/genreLabelTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/genreLabelTextView"
+            android:layout_marginStart="4dp"
+            android:padding="4dp"
+            app:textFromList="@{movie.genre}"
+            style="@style/TextAppearance.Binge.DetailedText"
+            tools:text="Action, Adventure" />
+
+        <TextView
+            android:id="@+id/movieTitleTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/detailedImageCardView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/detailedImageCardView"
+            android:layout_marginTop="18dp"
+            android:padding="4dp"
+            android:text="@{movie.movieName}"
+            style="@style/TextAppearance.Binge.Heading"
+            tools:text="@tools:sample/lorem" />
+
+        <TextView
+            android:id="@+id/movieDescTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@id/movieTitleTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/movieTitleTextView"
+            android:layout_marginTop="8dp"
+            android:padding="4dp"
+            android:text="@{movie.desc}"
+            style="@style/TextAppearance.Binge.DetailedText"
+            tools:text="Andha hai movie ekdum" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/openImdbButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@id/movieDescTextView"
+            app:layout_constraintEnd_toEndOf="@id/movieDescTextView"
+            app:layout_constraintTop_toBottomOf="@id/movieDescTextView"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:onClick="@{() ->  viewModel.openImdbUrlButtonClicked()}"
+            android:elevation="6dp"
+            android:text="@string/open_imdb"
+            style="@style/TextAppearance.Binge.Button" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

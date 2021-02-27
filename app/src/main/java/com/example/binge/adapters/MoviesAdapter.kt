@@ -13,7 +13,7 @@ import com.example.binge.R
 import com.example.binge.databinding.ItemMovieBinding
 import com.example.binge.model.data.Movies
 
-class MoviesAdapter :
+class MoviesAdapter(private val movieItemClickListener: MovieItemClicked) :
     ListAdapter<Movies, MoviesAdapter.MoviesViewHolder>(MoviesDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MoviesViewHolder {
@@ -43,6 +43,12 @@ class MoviesAdapter :
 //                .into(thumbNailImageView)
 //            movieNameTextView.text = movie.movieName
 //        }
+
+        init {
+            binding.mcvMovieThumbnail.setOnClickListener {
+                movieItemClickListener.onMovieItemClicked(getItem(layoutPosition))
+            }
+        }
 
         fun bind(movie: Movies) {
             binding.movie = movie

@@ -23,7 +23,7 @@
         tools:text="Ayushman Khurana"/>
 
     <TextView
-        android:id="@+id/descTextView"
+        android:id="@+id/movieDescTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAlignment="center"

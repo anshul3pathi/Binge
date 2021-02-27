@@ -1,5 +1,12 @@
 <resources>
     <string name="app_name">Binge</string>
     <string name="hello_blank_fragment">Fuck Off</string>
-    <string name="fetching_data_please_wait">Fetching data. Please Wait.</string>
+    <string name="fetching_data_please_wait">Fetching Movies. Please Wait.</string>
+    <string name="rating">Rating:</string>
+    <string name="directors">Directors:</string>
+    <string name="starring">Starring:</string>
+    <string name="genre">Genre:</string>
+    <string name="open_imdb">Open IMDB</string>
+    <string name="action_sort_by">Sort by</string>
+    <string name="change_theme">Change Theme</string>
 </resources>

@@ -6,6 +6,9 @@
         <item name="colorOnPrimary">@color/black</item>
         <item name="colorOnSecondary">@color/black</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+        <item name="colorControlNormal">?attr/colorOnPrimary</item>
+        <item name="colorOnPrimarySurface">?attr/colorPrimary</item>
+        <item name="colorOnSurface">?attr/colorPrimary</item>
     </style>
 
     <style name="Widget.Binge.Toolbar" parent="Widget.AppCompat.Toolbar">
@@ -16,9 +19,57 @@
     </style>
 
     <style name="TextAppearance.Binge.Toolbar" parent="TextAppearance.MaterialComponents.Button">
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="font">@font/alegreya_bold</item>
+        <item name="fontFamily">@font/alegreya_bold</item>
         <item name="android:fontFamily">@font/alegreya_bold</item>
+        <item name="theme">?theme</item>
+    </style>
+
+    <style name="TextAppearance.Binge.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="font">@font/alegreya</item>
+        <item name="fontFamily">@font/alegreya</item>
+        <item name="android:fontFamily">@font/alegreya</item>
+        <item name="backgroundTint">@color/grey_night</item>
+    </style>
+
+    <style name="TextAppearance.Binge.Heading" parent="TextAppearance.MaterialComponents.Headline1">
+        <item name="android:textSize">18sp</item>
+        <item name="font">@font/belgrano</item>
+        <item name="fontFamily">@font/belgrano</item>
+        <item name="android:fontFamily">@font/belgrano</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="theme">?theme</item>
+    </style>
+
+    <style name="TextAppearance.Binge.Body" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textSize">16sp</item>
+        <item name="font">@font/alegreya</item>
+        <item name="fontFamily">@font/belgrano</item>
+        <item name="android:fontFamily">@font/belgrano</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="TextAppearance.Binge.DetailedText" parent="TextAppearance.Binge.Body">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="TextAppearance.Binge.DetailedTextLabel" parent="TextAppearance.Binge.Body">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/grey</item>
+    </style>
+
+    <style name="Widget.Binge.CircularProgressIndicator" parent="Widget.MaterialComponents.CircularProgressIndicator">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.CircularProgressIndicator</item>
+        <item name="trackThickness">20dp</item>
+    </style>
+
+    <style name="ThemeOverlay.App.CircularProgressIndicator" parent="">
+        <item name="colorPrimary">@color/black</item>
     </style>
 
 </resources>
