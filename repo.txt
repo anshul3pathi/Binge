@@ -1,0 +1,127 @@
+private fun populateFeedData(feedData: MutableMap<String,
+            MutableList<Movies>>, sortBy: SortBy
+    ) {
+        Log.d(LOG_TAG, "populateFeedData")
+        val feedDataList = mutableListOf<GenreFeed>()
+        var i = 1L
+        for(item in feedData) {
+            feedDataList.add(GenreFeed(i, item.key, item.value))
+            i++
+        }
+        uiScope.launch {
+            feedDataList.sortBy { it.genre }
+        }
+        when(sortBy) {
+            SortBy.ALPHABETS -> {
+                _feedLiveDataAlpha.value = feedDataList
+            }
+            SortBy.RATING -> {
+                _feedLiveDataRating.value = feedDataList
+            } else -> {
+                _feedLiveDataYear.value = feedDataList
+            }
+        }
+        Log.d(LOG_TAG,"${feedData.size}")
+    }
+
+    private fun processRawDataHelper(sortBy: SortBy) {
+        Log.d(LOG_TAG, "processRawDataHelper")
+        val feedData = mutableMapOf<String, MutableList<Movies>>()
+        for(movie in fetchedData) {
+            for(genreItem in movie.genre) {
+                var list = feedData[genreItem]
+                if(list == null) {
+                    list = mutableListOf()
+                    list.add(movie)
+                } else {
+                    list.add(movie)
+                }
+                when(sortBy) {
+                    SortBy.RATING -> {
+                        list.sortBy { it.rating }
+                    }
+                    SortBy.ALPHABETS-> {
+                        list.sortBy { it.movieName }
+                    }
+                    else -> {
+                        list.sortBy { it.year }
+                    }
+                }
+                feedData[genreItem] = list
+            }
+        }
+        populateFeedData(feedData, sortBy)
+    }
+
+
+    private fun processRawData() {
+        Log.d(LOG_TAG, "processRawData")
+        for(item in SortBy.values()) {
+            processRawDataHelper(item)
+        }
+    }
+
+    private fun fetchRawData() {
+        Log.d(LOG_TAG, "fetchRawData")
+        _dataFetchingStatus.value = DataFetchingStatus.LOADING
+        uiScope.launch {
+            try {
+                fetchedData.addAll(IMDBApi.retrofitService.getMoviesData())
+                GlobalScope.launch(Dispatchers.Main) {
+                    _dataFetchingStatus.value = DataFetchingStatus.DONE
+//                    processRawData()
+                }
+            } catch(e: Exception) {
+                Log.e(LOG_TAG, "Couldn't fetch data. Error - ${e.message}")
+                GlobalScope.launch(Dispatchers.Main) {
+                    _dataFetchingStatus.value = DataFetchingStatus.FAILED
+                }
+            }
+        }
+    }
+
+    fun dataFetchingDecision() {
+        var checkItem: Movies? = null
+        uiScope.launch {
+            checkItem = moviesDataBaseDao.checkLastUpdateTime()
+        }
+
+        val currentTime = System.currentTimeMillis()
+        if(checkItem != null) {
+            if (currentTime - checkItem!!.lastUpdate >= UPDATE_THRESHOLD) {
+                fetchRawData()
+                if (_dataFetchingStatus.value == DataFetchingStatus.DONE) {
+                    updateMoviesDataBase()
+                } else {
+                    populateLiveDataFromDataBase()
+                }
+            } else {
+                populateLiveDataFromDataBase()
+            }
+        } else {
+            fetchRawData()
+            updateMoviesDataBase()
+        }
+    }
+
+    private fun updateMoviesDataBase() {
+        Log.d(LOG_TAG, "updateMoviesDataBAse")
+        val currentTime = System.currentTimeMillis()
+        for (item in fetchedData) {
+            item.lastUpdate = currentTime
+        }
+        uiScope.launch {
+            moviesDataBaseDao.insertAll(fetchedData)
+        }
+        populateLiveDataFromDataBase()
+    }
+
+    private fun populateLiveDataFromDataBase() {
+        Log.d(LOG_TAG, "populateLiveDataFromDataBase")
+        uiScope.launch {
+            val moviesData = moviesDataBaseDao.getAll()
+            fetchedData.clear()
+            fetchedData.addAll(moviesData!!)
+        }
+        processRawData()
+    }

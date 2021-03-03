@@ -1,24 +1,28 @@
 package com.example.binge.ui.fragments.feed
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.example.binge.CurrentTheme
+import com.example.binge.DataFetchingStatus
 import com.example.binge.R
+import com.example.binge.SortBy
 import com.example.binge.adapters.FeedAdapter
 import com.example.binge.adapters.MovieItemClicked
 import com.example.binge.databinding.FragmentMovieFeedBinding
-import com.example.binge.model.DataFetchingStatus
-import com.example.binge.model.SortBy
 import com.example.binge.model.data.Movies
+import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 class MovieFeedFragment : Fragment(), MovieItemClicked {
 
+
     private lateinit var viewModel: MovieFeedViewModel
+    private lateinit var viewModelFactory: MovieFeedViewModelFactory
     private lateinit var binding: FragmentMovieFeedBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -26,10 +30,9 @@ class MovieFeedFragment : Fragment(), MovieItemClicked {
         // Inflate the layout for this fragment
         binding = FragmentMovieFeedBinding.inflate(inflater)
 
-        viewModel = ViewModelProvider(
-                this,
-                ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(MovieFeedViewModel::class.java)
+        viewModelFactory = MovieFeedViewModelFactory(requireActivity())
+        viewModel = ViewModelProvider(this, viewModelFactory)
+            .get(MovieFeedViewModel::class.java)
 
         setHasOptionsMenu(true)
         return binding.root
@@ -72,11 +75,14 @@ class MovieFeedFragment : Fragment(), MovieItemClicked {
             }
         })
 
-        viewModel.darkModeStatus.observe(viewLifecycleOwner, {
-            if(it!!) {
+        viewModel.changeThemeTriggered.observe(viewLifecycleOwner, {
+            if (it) {
+                if (viewModel.currentTheme == CurrentTheme.LIGHT) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            } else {
+                } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                }
+                viewModel.themeChanged()
             }
         })
     }
@@ -111,13 +117,8 @@ class MovieFeedFragment : Fragment(), MovieItemClicked {
             true
         }
         R.id.actionChangeTheme -> {
-            if(viewModel.darkModeStatus.value!!) {
-                Toast.makeText(context, "Switched to Light Mode.", Toast.LENGTH_SHORT).show()
-                viewModel.changeDarkModeStatus(true)
-            } else {
-                Toast.makeText(context, "Switched to Dark Mode", Toast.LENGTH_SHORT).show()
-                viewModel.changeDarkModeStatus(false)
-            }
+
+            viewModel.changeTheme()
             true
         }
         else -> {

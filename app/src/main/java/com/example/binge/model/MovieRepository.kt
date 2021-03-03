@@ -1,33 +1,31 @@
 package com.example.binge.model
 
+import android.app.Activity
+import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
+import androidx.core.content.edit
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.binge.DataFetchingStatus
 import com.example.binge.IMDBApi
+import com.example.binge.SortBy
 import com.example.binge.model.data.GenreFeed
 import com.example.binge.model.data.Movies
+import com.example.binge.model.database.MoviesDataBaseDao
 import kotlinx.coroutines.*
-import java.lang.Exception
+import kotlin.time.ExperimentalTime
+import kotlin.time.hours
 
 const val LOG_TAG = "Movies Repository"
 
-enum class DataFetchingStatus {
-    LOADING,
-    FAILED,
-    DONE
-}
-
-enum class SortBy {
-    RATING,
-    ALPHABETS,
-    YEAR
-}
-
-class MovieRepository {
+@ExperimentalTime
+class MovieRepository(private val moviesDataBaseDao: MoviesDataBaseDao,
+                      private val activity: Activity) {
 
     private val job = Job()
     private val uiScope = CoroutineScope(job + Dispatchers.IO)
-    private val rawData = mutableListOf<Movies>()
+    private val fetchedData = mutableListOf<Movies>()
 
     private val _feedLiveDataAlpha = MutableLiveData<List<GenreFeed>>()
     val feedLiveDataAlpha: LiveData<List<GenreFeed>>
@@ -45,83 +43,155 @@ class MovieRepository {
     val dataFetchingStatus: LiveData<DataFetchingStatus>
         get() = _dataFetchingStatus
 
+    private val parentFeedData = mutableListOf<GenreFeed>()
+
+    private lateinit var sharedPref: SharedPreferences
+
+
+    companion object {
+        private val UPDATE_THRESHOLD = 1.hours.inMilliseconds.toLong()
+        private const val LAST_SYNCED_KEY = "lastUpdateTime"
+    }
+
     init {
-        fetchRawData()
+        shouldFetchData()
     }
 
-    private fun processRawDataHelper(sortBy: SortBy) {
-        val feedData = mutableMapOf<String, MutableList<Movies>>()
-        for(movie in rawData) {
-            for(genreItem in movie.genre) {
-                var list = feedData[genreItem]
-                if(list == null) {
-                    list = mutableListOf()
-                    list.add(movie)
-                } else {
-                    list.add(movie)
-                }
-                when(sortBy) {
-                    SortBy.RATING -> {
-                        list.sortBy { it.rating }
-                    }
-                    SortBy.ALPHABETS-> {
-                        list.sortBy { it.movieName }
-                    }
-                    else -> {
-                        list.sortBy { it.year }
-                    }
-                }
-                feedData[genreItem] = list
-            }
-        }
-        populateFeedData(feedData, sortBy)
-    }
+    private fun shouldFetchData() {
+        sharedPref = activity.getPreferences(Context.MODE_PRIVATE)
+        val lastSynced = sharedPref.getLong(LAST_SYNCED_KEY, -1)
+        Log.d(LOG_TAG, "$lastSynced")
 
-    private fun populateFeedData(feedData: MutableMap<String,
-            MutableList<Movies>>, sortBy: SortBy
-    ) {
-        val feedDataList = mutableListOf<GenreFeed>()
-        var i = 1L
-        for(item in feedData) {
-            feedDataList.add(GenreFeed(i, item.key, item.value))
-            i++
-        }
-        uiScope.launch {
-            feedDataList.sortBy { it.genre }
-        }
-        when(sortBy) {
-            SortBy.ALPHABETS -> {
-                _feedLiveDataAlpha.value = feedDataList
-            }
-            SortBy.RATING -> {
-                _feedLiveDataRating.value = feedDataList
-            } else -> {
-                _feedLiveDataYear.value = feedDataList
-            }
-        }
-    }
+        val currentTime = System.currentTimeMillis()
 
-    private fun processRawData() {
-        for(item in SortBy.values()) {
-            processRawDataHelper(item)
-        }
-    }
-
-    private fun fetchRawData() {
         _dataFetchingStatus.value = DataFetchingStatus.LOADING
+
+        if(currentTime - lastSynced >= UPDATE_THRESHOLD || lastSynced == -1L) {
+            fetchNewData()
+        } else {
+            fetchFromDataBase()
+        }
+    }
+
+    private fun fetchNewData() {
+        Log.d(LOG_TAG, "fetching new data")
         uiScope.launch {
             try {
-                rawData.addAll(IMDBApi.retrofitService.getMoviesData())
+                fetchedData.addAll(IMDBApi.retrofitService.getMoviesData())
                 GlobalScope.launch(Dispatchers.Main) {
                     _dataFetchingStatus.value = DataFetchingStatus.DONE
-                    processRawData()
+                    updateDataBase()
                 }
             } catch(e: Exception) {
                 Log.e(LOG_TAG, "Couldn't fetch data. Error - ${e.message}")
                 GlobalScope.launch(Dispatchers.Main) {
                     _dataFetchingStatus.value = DataFetchingStatus.FAILED
+                    fetchFromDataBase()
                 }
             }
         }
     }
+
+    private fun updateDataBase() {
+
+        Log.d(LOG_TAG, "updating database")
+
+        sharedPref.edit {
+            putLong(LAST_SYNCED_KEY, System.currentTimeMillis())
+        }
+
+        uiScope.launch {
+            moviesDataBaseDao.deleteOldData()
+            moviesDataBaseDao.insertAll(fetchedData)
+            withContext(Dispatchers.Main) {
+                convertDataToFeedData()
+            }
+        }
+    }
+
+    private fun fetchFromDataBase() {
+        Log.d(LOG_TAG, "fetching from database")
+        uiScope.launch {
+            val dataFromDb = moviesDataBaseDao.getAll()
+            if (dataFromDb == null && _dataFetchingStatus.value == DataFetchingStatus.LOADING) {
+                fetchNewData()
+            } else if (dataFromDb == null &&
+                _dataFetchingStatus.value == DataFetchingStatus.FAILED) {
+                Log.e(LOG_TAG, "Cannot fetch new data - Error!")
+            } else {
+                fetchedData.clear()
+                fetchedData.addAll(dataFromDb!!)
+                withContext(Dispatchers.Main) {
+                    _dataFetchingStatus.value = DataFetchingStatus.DONE
+                    convertDataToFeedData()
+                }
+            }
+        }
+    }
+
+    private fun convertDataToFeedData() {
+        val feedData = mutableMapOf<String, MutableList<Movies>>()
+        for (movie in fetchedData) {
+            for (genreItem in movie.genre) {
+                var list = feedData[genreItem]
+                if(list == null) {
+                    list = mutableListOf(movie)
+                } else {
+                    list.add(movie)
+                }
+                feedData[genreItem] = list
+            }
+        }
+
+        var i = 0L
+        for (feedItem in feedData) {
+            parentFeedData.add(GenreFeed(i, feedItem.key, feedItem.value))
+            i++
+        }
+        populateSortByDataFromParentFeedData()
+    }
+
+    private fun populateSortByDataFromParentFeedData() {
+        for (sortBy in SortBy.values()) {
+            when (sortBy) {
+                SortBy.ALPHABETS -> {
+                    val tempList = mutableListOf<GenreFeed>()
+                    for (item in parentFeedData) {
+                        tempList.add(
+                            GenreFeed(
+                            item.id,
+                            item.genre,
+                            item.movies.sortedBy { it.movieName })
+                        )
+                    }
+                    _feedLiveDataAlpha.value = tempList
+                }
+                SortBy.RATING -> {
+                    val tempList = mutableListOf<GenreFeed>()
+                    for (item in parentFeedData) {
+                        tempList.add(
+                            GenreFeed(
+                                item.id,
+                                item.genre,
+                                item.movies.sortedByDescending { it.rating })
+                        )
+                    }
+                    _feedLiveDataRating.value = tempList
+                }
+                else -> {
+                    val tempList = mutableListOf<GenreFeed>()
+                    for (item in parentFeedData) {
+                        tempList.add(
+                            GenreFeed(
+                                item.id,
+                                item.genre,
+                                item.movies.sortedByDescending { it.year })
+                        )
+                    }
+                    _feedLiveDataYear.value = tempList
+                }
+            }
+        }
+    }
+
 }

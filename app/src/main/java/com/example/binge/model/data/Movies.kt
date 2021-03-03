@@ -7,8 +7,8 @@ import androidx.room.PrimaryKey
 import com.squareup.moshi.Json
 import kotlinx.android.parcel.Parcelize
 
-@Entity(tableName = "movies")
 @Parcelize
+@Entity(tableName = "movies")
 data class Movies(
     @Json(name = "actors") val actors: List<String>,
     @Json(name = "desc") val desc: String,
@@ -19,7 +19,7 @@ data class Movies(
     @Json(name = "imdb_url") val imdbUrl: String,
     @Json(name = "name") val movieName: String,
     @Json(name = "rating") val rating: Double,
-    @Json(name = "year") val year: Int
+    @Json(name = "year") val year: Int,
 ) : Parcelable {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
