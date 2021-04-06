@@ -30,8 +30,6 @@ This project follows the famous MVVM architecture and best practices from Google
 
 ![](extras/arch.png)
 
-## Project Structure 📂
-
 ## Credits 🤗
 
 - 🤓 Icons are from [flaticon.com](https://www.flaticon.com/) 
