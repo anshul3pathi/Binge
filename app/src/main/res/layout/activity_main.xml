@@ -23,7 +23,7 @@
             app:title="@string/app_name"
             app:titleTextAppearance="@style/TextAppearance.Binge.Toolbar"
             app:layout_scrollFlags="scroll|enterAlways|snap"
-            style="@style/Widget.Binge.Toolbar" />
+            style="@style/Widget.Binge.Toolbar"/>
 
         <!--        <androidx.recyclerview.widget.RecyclerView-->
         <!--            android:id="@+id/recyclerView"-->

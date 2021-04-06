@@ -13,7 +13,8 @@
         <action
             android:id="@+id/actionDetailFragment"
             app:destination="@id/detailMovieFragment"
-            app:popUpTo="@id/movieFeedFragment" />
+            app:popUpTo="@id/movieFeedFragment"
+            app:popUpToInclusive="false" />
     </fragment>
 
     <fragment
@@ -23,9 +24,9 @@
         tools:layout="@layout/fragment_detail_movie">
         <argument
             android:name="currentMovie"
-            android:defaultValue="@null"
             app:argType="com.example.binge.model.data.Movies"
-            app:nullable="true" />
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
 
 </navigation>

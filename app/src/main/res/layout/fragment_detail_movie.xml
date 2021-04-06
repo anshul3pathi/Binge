@@ -137,6 +137,30 @@
             tools:text="Action, Adventure" />
 
         <TextView
+            android:id="@+id/yearLabelTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/genreTextView"
+            app:layout_constraintStart_toStartOf="@id/genreLabelTextView"
+            android:layout_marginTop="8dp"
+            android:padding="4dp"
+            android:text="@string/year"
+            style="@style/TextAppearance.Binge.DetailedTextLabel"/>
+
+        <TextView
+            android:id="@+id/yearTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/yearLabelTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/yearLabelTextView"
+            android:layout_marginStart="4dp"
+            android:padding="4dp"
+            app:textFromLong="@{movie.year}"
+            style="@style/TextAppearance.Binge.DetailedText"
+            tools:text="2021" />
+
+        <TextView
             android:id="@+id/movieTitleTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

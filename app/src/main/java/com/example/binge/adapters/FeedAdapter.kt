@@ -14,9 +14,13 @@ import kotlinx.coroutines.GlobalScope
 class FeedAdapter(private val movieItemClickListener: MovieItemClicked) :
             ListAdapter<GenreFeed, FeedAdapter.FeedItemViewHolder>(FeedDiffCallback()) {
 
+    private var inflater: LayoutInflater? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedItemViewHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        val binding = ItemFeedBinding.inflate(layoutInflater, parent, false)
+        if(inflater == null) {
+            inflater = LayoutInflater.from(parent.context)
+        }
+        val binding = ItemFeedBinding.inflate(inflater!!, parent, false)
         return FeedItemViewHolder(binding)
     }
 
@@ -31,12 +35,19 @@ class FeedAdapter(private val movieItemClickListener: MovieItemClicked) :
 
     inner class FeedItemViewHolder(private val binding: ItemFeedBinding)
         : RecyclerView.ViewHolder(binding.root) {
+
+        private val moviesAdapter by lazy {
+            val adapter = MoviesAdapter(movieItemClickListener).apply {
+                setHasStableIds(true)
+                stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            }
+            binding.movieRecyclerView.adapter = adapter
+            adapter
+        }
+
         fun bind(genreFeed: GenreFeed) {
-            val movieAdapter = MoviesAdapter(movieItemClickListener)
-            binding.genreRecyclerView.adapter = movieAdapter
-//            genreFeed.movies = genreFeed.movies.sortedBy { it.movieName }
-            movieAdapter.submitList(genreFeed.movies)
             binding.feed = genreFeed
+            moviesAdapter.submitList(genreFeed.movies)
         }
     }
 }

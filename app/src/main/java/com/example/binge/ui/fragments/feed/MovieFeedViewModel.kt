@@ -1,106 +1,100 @@
 package com.example.binge.ui.fragments.feed
 
-import android.app.Activity
-import android.content.Context
 import android.util.Log
-import androidx.core.content.edit
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.binge.CurrentTheme
-import com.example.binge.DataFetchingStatus
-import com.example.binge.R
-import com.example.binge.SortBy
-import com.example.binge.model.MovieRepository
+import androidx.lifecycle.viewModelScope
+import com.example.binge.*
 import com.example.binge.model.data.GenreFeed
-import com.example.binge.model.database.MoviesDataBase
+import com.example.binge.model.data.Movies
+import com.example.binge.model.repository.MoviesRepo
+import com.example.binge.model.storage.Storage
+import kotlinx.coroutines.launch
+import com.example.binge.model.Result
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.lang.IllegalArgumentException
+import javax.inject.Inject
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
-class MovieFeedViewModel(private val activity: Activity) :
-        ViewModel() {
+class MovieFeedViewModel @Inject constructor(
+    private val moviesRepository: MoviesRepo,
+    private val sharedPreferencesStorage: Storage
+) : ViewModel() {
 
-    val feedLiveDataAlpha: LiveData<List<GenreFeed>>
+    private var sortBy = SortBy.ALPHABETS
 
-    val feedLiveDataRating: LiveData<List<GenreFeed>>
+    private val _sortByToast = MutableLiveData<String>()
+    val sortByToast = _sortByToast
 
-    val feedLiveDataYear: LiveData<List<GenreFeed>>
+    private val _feedData = MutableLiveData<List<GenreFeed>>()
+    val feedData = _feedData
 
-    val dataFetchingStatus: LiveData<DataFetchingStatus>
-
-    private val _changeThemeTriggered = MutableLiveData<Boolean>()
-    val changeThemeTriggered: LiveData<Boolean>
-        get() = _changeThemeTriggered
-
-    private val _sortBy = MutableLiveData<SortBy>()
-    val sortBy: LiveData<SortBy>
-        get() = _sortBy
-
-
-    private val moviesDataBaseDao = MoviesDataBase
-        .getDatabase(activity.application).moviesDataBaseDao
-
-    private val movieRepository = MovieRepository(moviesDataBaseDao, activity)
-
-    private var _currentTheme: CurrentTheme
-    val currentTheme: CurrentTheme
-        get() = _currentTheme
-
-    private val sharedPref = activity.getSharedPreferences(
-        activity.applicationContext.getString(R.string.theme_shared_preference),
-        Context.MODE_PRIVATE
-    )
-
+    private val _dataFetchingStatus = MutableLiveData(DataFetchingStatus.LOADING)
+    val dataFetchingStatus = _dataFetchingStatus
 
     init {
-        feedLiveDataAlpha = movieRepository.feedLiveDataAlpha
-        feedLiveDataRating = movieRepository.feedLiveDataRating
-        feedLiveDataYear = movieRepository.feedLiveDataYear
-
-        dataFetchingStatus = movieRepository.dataFetchingStatus
-
-        val themeValue = sharedPref.getBoolean(
-            activity.applicationContext.getString(R.string.dark_theme_enabled_key),
-            false
-        )
-        _currentTheme = if (themeValue) {
-            CurrentTheme.DARK
-        } else {
-            CurrentTheme.LIGHT
-        }
-        _sortBy.value = SortBy.ALPHABETS
+        populateFeedData()
     }
 
-    fun changeTheme() {
-        _changeThemeTriggered.value = true
-        Log.d("MovieFeedViewModel", "$_currentTheme")
-    }
-
-    fun themeChanged() {
-        _changeThemeTriggered.value = false
-        if (_currentTheme == CurrentTheme.LIGHT) {
-            _currentTheme = CurrentTheme.DARK
-            sharedPref.edit {
-                putBoolean(
-                    activity.applicationContext.getString(R.string.dark_theme_enabled_key),
-                    true
-                )
+    private fun populateFeedData() {
+        viewModelScope.launch {
+            val moviesData = moviesRepository.getMovies()
+            withContext(Dispatchers.Main) {
+                if(moviesData is Result.Success) {
+                    _dataFetchingStatus.value = DataFetchingStatus.DONE
+//                    convertMovieDataToFeedData(moviesData.data)
+                    _feedData.value =
+                        sortFeedData(sortBy, convertMovieDataToFeedData(moviesData.data))
+//                    sortFeedData()
+                } else if (moviesData is Result.Error){
+                    _dataFetchingStatus.value = DataFetchingStatus.FAILED
+                }
             }
-            Log.d("MovieFeedViewModel", "dark mode - true")
-        } else {
-            _currentTheme = CurrentTheme.LIGHT
-            sharedPref.edit {
-                putBoolean(
-                    activity.applicationContext.getString(R.string.dark_theme_enabled_key),
-                    false
-                )
-            }
-            Log.d("MovieFeedViewModel", "dark mode - false")
         }
-
     }
 
-    fun changeSortByType(sortOrder: SortBy) {
-        _sortBy.value = sortOrder
+    fun refreshData() {
+        populateFeedData()
     }
+
+    fun saveThemePreference(currentTheme: CurrentTheme) {
+        when (currentTheme) {
+            CurrentTheme.LIGHT -> {
+                sharedPreferencesStorage.setBoolean(false)
+//                Log.d("MovieFeedViewModel", "theme preference to false")
+            }
+            CurrentTheme.DARK -> {
+                sharedPreferencesStorage.setBoolean(true)
+//                Log.d("MovieFeedViewModel", "theme preference to true")
+            }
+        }
+    }
+
+    fun getCurrentTheme(): CurrentTheme {
+        return when(sharedPreferencesStorage.getBoolean()) {
+            true -> CurrentTheme.DARK
+            false -> CurrentTheme.LIGHT
+        }
+    }
+
+    fun changeSortByType(sortBy: SortBy) {
+        if(sortBy != this.sortBy) {
+            this.sortBy = sortBy
+            when (sortBy) {
+                SortBy.YEAR -> {
+                    _sortByToast.value = "Sorting by year."
+                }
+                SortBy.RATING -> {
+                    _sortByToast.value = "Sorting by rating."
+                }
+                SortBy.ALPHABETS -> {
+                    _sortByToast.value = "Sorting by movie name."
+                }
+            }
+            _feedData.value = sortFeedData(sortBy, _feedData.value!!)
+        }
+    }
+
 }

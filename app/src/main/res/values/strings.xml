@@ -11,4 +11,10 @@
     <string name="change_theme">Change Theme</string>
     <string name="theme_shared_preference">theme_file_name</string>
     <string name="dark_theme_enabled_key">is_dark_theme_enabled</string>
+    <string name="last_synced_key">time last synced</string>
+    <string name="dark_theme_shared_preference">dark_theme?</string>
+    <string name="year">Year:</string>
+    <string name="alphabets_menu_item">Name</string>
+    <string name="rating_menu_item">Rating</string>
+    <string name="year_menu_item">Year</string>
 </resources>

@@ -6,7 +6,27 @@
         android:id="@+id/actionSortBy"
         android:icon="@drawable/ic_sort"
         android:title="@string/action_sort_by"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom" >
+
+        <menu>
+            <item
+                android:id="@+id/sortByAlpha"
+                android:title="@string/alphabets_menu_item"
+                app:showAsAction="never"/>
+
+            <item
+                android:id="@+id/sortByRating"
+                android:title="@string/rating_menu_item"
+                app:showAsAction="never"/>
+
+            <item
+                android:id="@+id/sortByYear"
+                android:title="@string/year_menu_item"
+                app:showAsAction="never"/>
+        </menu>
+
+    </item>
+
     <item
         android:id="@+id/actionChangeTheme"
         android:icon="@drawable/ic_theme_icon"

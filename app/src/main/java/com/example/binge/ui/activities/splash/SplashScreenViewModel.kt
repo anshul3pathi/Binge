@@ -9,8 +9,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.binge.R
+import com.example.binge.model.storage.Storage
+import javax.inject.Inject
 
-class SplashScreenViewModel(sharedPref: SharedPreferences, context: Context) : ViewModel() {
+class SplashScreenViewModel @Inject constructor(sharedPref: Storage) : ViewModel() {
 
     private val _startIntent = MutableLiveData<Boolean>()
     val startIntent: LiveData<Boolean>
@@ -26,10 +28,7 @@ class SplashScreenViewModel(sharedPref: SharedPreferences, context: Context) : V
 
 
     init {
-        _darkMode.value = sharedPref.getBoolean(
-            context.getString(R.string.dark_theme_enabled_key),
-            false
-        )
+        _darkMode.value = sharedPref.getBoolean()
         Log.d("SplashScreenViewModel", "${_darkMode.value}")
         _startIntent.value = false
         _progressValue.value = 0
@@ -38,9 +37,14 @@ class SplashScreenViewModel(sharedPref: SharedPreferences, context: Context) : V
 
     private fun startTimer() {
 
-        val timer = object : CountDownTimer(5000, 1000) {
+        val inFuture = 1000L
+        val countDownInterval = 1000L
+
+        val timer = object : CountDownTimer(inFuture, countDownInterval) {
             override fun onTick(p0: Long) {
-                _progressValue.value = _progressValue.value?.plus(20)
+                val progressValue = ((100 * countDownInterval) / inFuture).toInt()
+                _progressValue.value =
+                    _progressValue.value?.plus(progressValue)
             }
 
             override fun onFinish() {

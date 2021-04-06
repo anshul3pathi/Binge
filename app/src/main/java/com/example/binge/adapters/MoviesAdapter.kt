@@ -16,45 +16,36 @@ import com.example.binge.model.data.Movies
 class MoviesAdapter(private val movieItemClickListener: MovieItemClicked) :
     ListAdapter<Movies, MoviesAdapter.MoviesViewHolder>(MoviesDiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MoviesViewHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        val binding = ItemMovieBinding.inflate(layoutInflater)
-        return MoviesViewHolder(binding)
+    private var inflater: LayoutInflater? = null
 
-//        val view = LayoutInflater.from(parent.context)
-//            .inflate(R.layout.item_movie, parent, false)
-//        return MoviesViewHolder(view)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MoviesViewHolder {
+        if(inflater == null) {
+            inflater = LayoutInflater.from(parent.context)
+        }
+        val binding = ItemMovieBinding.inflate(inflater!!, parent, false)
+        return MoviesViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: MoviesViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
+    override fun getItemId(position: Int): Long {
+        return getItem(position).id.toLong()
+    }
+
 
     inner class MoviesViewHolder(private val binding: ItemMovieBinding) :
             RecyclerView.ViewHolder(binding.root){
 
-//        private val thumbNailImageView: ImageView = itemView.findViewById(R.id.movieThumbnailImageView)
-//        private val movieNameTextView: TextView = itemView.findViewById(R.id.movieNameTextView)
-//
-//        fun bind(movie: Movies) {
-//            Glide.with(thumbNailImageView.context)
-//                .load(movie.thumbNailUrl)
-//                .into(thumbNailImageView)
-//            movieNameTextView.text = movie.movieName
-//        }
-
         init {
-            binding.mcvMovieThumbnail.setOnClickListener {
+            binding.movieItemConstraintLayout.setOnClickListener {
                 movieItemClickListener.onMovieItemClicked(getItem(layoutPosition))
             }
         }
 
         fun bind(movie: Movies) {
             binding.movie = movie
-//            Glide.with(binding.movieThumbnailImageView.context)
-//                .load(movie.thumbNailUrl)
-//                .into(binding.movieThumbnailImageView)
         }
 
     }
@@ -63,7 +54,7 @@ class MoviesAdapter(private val movieItemClickListener: MovieItemClicked) :
 
 class MoviesDiffCallback : DiffUtil.ItemCallback<Movies>() {
     override fun areItemsTheSame(oldItem: Movies, newItem: Movies): Boolean {
-        return oldItem.movieName == newItem.movieName
+        return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(oldItem: Movies, newItem: Movies): Boolean {

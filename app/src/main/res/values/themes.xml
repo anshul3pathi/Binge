@@ -9,10 +9,14 @@
         <item name="colorControlNormal">?attr/colorOnPrimary</item>
         <item name="colorOnPrimarySurface">?attr/colorPrimary</item>
         <item name="colorOnSurface">?attr/colorPrimary</item>
+        <item name="popupMenuBackground">?attr/colorPrimary</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
     </style>
 
     <style name="Widget.Binge.Toolbar" parent="Widget.AppCompat.Toolbar">
         <item name="android:background">?attr/colorPrimary</item>
+        <item name="android:colorBackground">?attr/colorPrimary</item>
+        <item name="popupMenuBackground">?attr/colorPrimary</item>
         <item name="titleTextColor">?attr/colorOnPrimary</item>
         <item name="titleTextAppearance">@style/TextAppearance.Binge.Toolbar</item>
         <item name="android:theme">?theme</item>

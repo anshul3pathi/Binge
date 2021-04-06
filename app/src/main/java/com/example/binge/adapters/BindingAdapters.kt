@@ -19,3 +19,8 @@ fun setTextFromDouble(textView: TextView, value: Double) {
 fun setTextFromList(textView: TextView, list: List<String>) {
     textView.text = list.joinToString(", ")
 }
+
+@BindingAdapter("textFromLong")
+fun setTextFromLong(textView: TextView, value: Long) {
+    textView.text = value.toString()
+}

@@ -4,10 +4,12 @@ import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.binge.randomNumberGenerator
 import com.squareup.moshi.Json
 import kotlinx.android.parcel.Parcelize
+import java.io.Serializable
+import java.util.*
 
-@Parcelize
 @Entity(tableName = "movies")
 data class Movies(
     @Json(name = "actors") val actors: List<String>,
@@ -19,9 +21,9 @@ data class Movies(
     @Json(name = "imdb_url") val imdbUrl: String,
     @Json(name = "name") val movieName: String,
     @Json(name = "rating") val rating: Double,
-    @Json(name = "year") val year: Int,
-) : Parcelable {
-    @PrimaryKey(autoGenerate = true)
+    @Json(name = "year") val year: Long,
+) : Serializable {
+    @PrimaryKey
     @ColumnInfo(name = "id")
-    var id: Long = 0
+    var id: Long = randomNumberGenerator()
 }
